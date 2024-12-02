@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>이메일 작성</title>
+</head>
+<body>
+    <h1>이메일 정보 입력</h1>
+    <form action="/send_email" method="post">
+        <label for="recipient">받는 사람:</label>
+        <input type="email" id="recipient" name="recipient" required><br><br>
+        
+        <label for="customer_name">고객 이름:</label>
+        <input type="text" id="customer_name" name="customer_name" required><br><br>
+        
+        <label for="product_name">상품명:</label>
+        <input type="text" id="product_name" name="product_name" required><br><br>
+        
+        <label for="payment_time">결제일시:</label>
+        <input type="text" id="payment_time" name="payment_time" required><br><br>
+        
+        <label for="order_number">주문번호:</label>
+        <input type="text" id="order_number" name="order_number" required><br><br>
+        
+        <label for="payment_method">결제수단:</label>
+        <input type="text" id="payment_method" name="payment_method" required><br><br>
+        
+        <label for="amount">결제금액:</label>
+        <input type="text" id="amount" name="amount" required><br><br>
+        
+        <button type="submit">전송</button>
+    </form>
+</body>
+</html>
