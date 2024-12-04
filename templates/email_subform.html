@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>이메일 작성</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-section {
+            flex: 1;
+        }
+
+        .form-section h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #005fcc;
+        }
+
+        form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        form input, form button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        form button {
+            background-color: #005fcc;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        form button:hover {
+            background-color: #004bb5;
+        }
+
+        .upload-section {
+            flex: 0.4;
+            margin-left: 20px;
+            text-align: center;
+        }
+
+        .upload-section button {
+            width: 80%;
+            background-color: #005fcc;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .upload-section button:hover {
+            background-color: #004bb5;
+        }
+
+        .upload-section .user-list {
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+
+        .user-list label {
+            display: block;
+            margin: 5px 0;
+        }
+    </style>
+    <script>
+        // "모두 체크" 및 "체크 해제" 기능
+        function toggleCheckboxes() {
+            const checkboxes = document.querySelectorAll('input[name="selected_user"]');
+            const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
+            
+            checkboxes.forEach(checkbox => checkbox.checked = !allChecked);
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <!-- 왼쪽 입력 폼 -->
+        <div class="form-section">
+            <h1>이메일 정보 입력</h1>
+            <form action="/send_email" method="post">
+                <input type="hidden" id="selected_users" name="selected_users" required>
+                
+                <label for="product_name">상품명:</label>
+                <input type="text" id="product_name" name="product_name" required>
+                
+                <label for="payment_time">결제일시:</label>
+                <input type="text" id="payment_time" name="payment_time" required>
+                
+                <label for="order_number">주문번호:</label>
+                <input type="text" id="order_number" name="order_number" required>
+                
+                <label for="payment_method">결제수단:</label>
+                <input type="text" id="payment_method" name="payment_method" required>
+                
+                <label for="amount">결제금액:</label>
+                <input type="text" id="amount" name="amount" required>
+                
+                <button type="submit">전송</button>
+            </form>
+        </div>
+
+        <!-- 오른쪽 엑셀 업로드 -->
+        <button type="button" onclick="toggleCheckboxes()">모두 체크/해제</button>
+        <div class="upload-section">
+            <h2>엑셀 업로드</h2>
+            <button id="uploadBtn">엑셀 파일 업로드</button>
+            <input type="file" id="excelFile" style="display: none;" accept=".xlsx, .xls">
+            <div class="user-list" id="userList">
+                <p>엑셀 파일을 업로드 해주세요.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        const uploadBtn = document.getElementById('uploadBtn');
+        const excelFile = document.getElementById('excelFile');
+        const userList = document.getElementById('userList');
+        const selectedUsersInput = document.getElementById('selected_users');
+
+        // 버튼 클릭 시 파일 선택 창 열기
+        uploadBtn.addEventListener('click', () => {
+            excelFile.click();
+        });
+
+        // 엑셀 파일 읽기
+        excelFile.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+                    // 사용자 목록 생성
+                    userList.innerHTML = ''; // 기존 목록 초기화
+                    jsonData.forEach((row, index) => {
+                        const name = row['이름'] || `사용자 ${index + 1}`;
+                        const email = row['이메일'] || 'unknown@example.com';
+                        const listItem = document.createElement('label');
+                        listItem.innerHTML = `
+                            <input type="checkbox" name="selected_user" value="${email}|${name}">
+                            ${name} (${email})
+                        `;
+                        userList.appendChild(listItem);
+                    });
+                };
+                reader.readAsArrayBuffer(file);
+            }
+        });
+
+        // 폼 제출 시 선택된 사용자 데이터를 전달
+        document.querySelector('form').addEventListener('submit', (e) => {
+            const selectedUsers = Array.from(document.querySelectorAll('input[name="selected_user"]:checked'))
+                .map(user => user.value);
+            selectedUsersInput.value = JSON.stringify(selectedUsers);
+        });
+    </script>
+</body>
+</html>
