@@ -1,0 +1,57 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        /* 공통 스타일 */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        /* 네비게이션 바 스타일 */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f4f4f4;
+            padding: 10px 20px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .navbar a, .navbar span {
+            text-decoration: none;
+            color: #333;
+            padding: 8px 16px;
+            font-weight: bold;
+        }
+
+
+        .navbar-brand {
+            font-size: 1.5em;
+            color: #007BFF;
+        }
+
+        .navbar-menu {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 네비게이션바 -->
+    <nav class="navbar">
+        <a class="navbar-brand" href="{{ url_for('index') }}">Pyboard</a>
+        <div class="navbar-menu">
+            {% if name %}
+            <span>{{ name }}</span>
+            <a href="{{ url_for('logout') }}">로그아웃</a>
+            {% else %}
+            <a href="{{ url_for('index') }}">로그인</a>
+            {% endif %}
+        </div>
+    </nav>
+</body>
+</html>
