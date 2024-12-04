@@ -5,14 +5,8 @@
     <title>이메일 작성 - Tab2</title>
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
     <style>
-        .toastui-editor-contents p,
-        .toastui-editor-contents h1,
-        .toastui-editor-contents h2,
-        .toastui-editor-contents h3,
-        .toastui-editor-contents h4,
-        .toastui-editor-contents h5,
-        .toastui-editor-contents h6 {
-            margin: 0px !important;
+        #preview-content p, h1, h2, h3, h4, h5, h6{
+            margin: 0px;
         }
         
         body {
@@ -76,7 +70,7 @@
         .upload-section h2 {
             font-size: 20px;
             color: #005fcc;
-            margin-bottom: 20px;
+            margin-bottom: 52px;
         }
 
         .upload-section button {
@@ -133,9 +127,9 @@
             border: 1px solid #ccc;
             border-radius: 5px;
             background: #f9f9f9;
-            overflow-y: auto;
+            overflow-y: auto; /* 스크롤 활성화 */
+            max-height: 450px; /* 최대 높이 설정 */
         }
-
         .submit-section {
             text-align: center;
             margin-top: 20px;
@@ -169,20 +163,27 @@
         }
     
         .user-list {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
+            width: 80%;
+            overflow-y: auto; /* 스크롤 활성화 */
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            max-height: 400px;
         }
         #preview-content {
             margin-left: 25px;
             margin-right: 25px;
         }
-        #preview-content p, h1, h2, h3, h4, h5, h6{
-            margin: 0px;
+        #preview-box-title {
+            margin-bottom: 47px;
         }
+        
+        
     </style>
 </head>
 <body>
+    {% include "navbar.html" %}
     <div class="container">
         <!-- 작성 폼 섹션 -->
         <div class="editor-section">
@@ -196,7 +197,7 @@
 
         <!-- 미리보기 섹션 -->
         <div class="preview-section">
-            <h2>미리보기</h2>
+            <h2 id="preview-box-title">미리보기</h2>
             <div class="preview-box" id="preview-box">
                 <h2 id="preview-title">제목</h2>
                 <div id="preview-content">내용이 이곳에 표시됩니다.</div>
