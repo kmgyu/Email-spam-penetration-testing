@@ -198,7 +198,7 @@ def search_spam_warning():
     
     # 'all' 파라미터가 있을 때 모든 유저의 진입 기록을 보여주기
     if all_users:
-        return render_template('all_user_counts.html', user_counts=user_counts)
+        return render_template('all_user_counts.html', access_records=access_records)
     
     if mail:
         # 해당 유저의 카운트 증가
@@ -206,7 +206,7 @@ def search_spam_warning():
             user_counts[mail] = 0
         user_counts[mail] += 1
         timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        access_records.append((mail, timestamp))
+        access_records.append({'user_email' : mail, 'Timestamp' : timestamp})
         # 전체 카운트 증가
         global_count += 1
 
