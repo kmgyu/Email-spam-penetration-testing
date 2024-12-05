@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
         @charset "utf-8";
         /* base - 브라우저 별로 다를 수도 있는 것을 초기화 */
@@ -100,7 +99,6 @@
     {% include "navbar.html" %}
     <div class="loginbox">
         <form method="POST" id="authForm">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>         
             <h2> 로그인</h2>
             <!-- 아이디와 비밀번호 입력 폼 -->
             <fieldset>
