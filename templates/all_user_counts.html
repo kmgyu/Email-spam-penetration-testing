@@ -10,7 +10,9 @@
     <h2>User Access Records</h2>
     <ul>
         {% for record in access_records %}
-            <li>User Email: {{ record.user_email }} - Timestamp: {{ record.timestamp }}</li>
+            {% for mail, count in record.items() %}
+                <li>User Email: {{ mail }} - Timestamp: {{ count }}</li>
+            {% endfor %}
         {% endfor %}
     </ul>
 </body>
