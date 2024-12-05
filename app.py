@@ -229,8 +229,8 @@ def main_short_url(email):
         return jsonify({"error": "mail 파라미터가 필요합니다."}), 400
 
     try:
-        # original_url = f"http://172.23.21.248:8080/spam_waringing/search?mail={email}"  # URL 포맷
-        original_url = f"http://127.0.0.1:5000/spam_warning/search?mail={email}"  # URL 포맷
+        original_url = f"http://172.23.21.248:8080/spam_waringing/search?mail={email}"  # URL 포맷
+        # original_url = f"http://127.0.0.1:5000/spam_warning/search?mail={email}"  # test URL 포맷
         shortener = pyshorteners.Shortener()
         short_url = shortener.tinyurl.short(original_url)
         return jsonify({
