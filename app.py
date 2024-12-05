@@ -185,7 +185,7 @@ user_counts = {}
 access_records = []
 @app.route('/spam_warning/search', methods=['GET'])
 def search_spam_warning():
-    global global_count, user_counts
+    global global_count, user_counts, access_records
     # 쿼리 스트링에서 'user_id' 파라미터를 받아오기
     mail = request.args.get('mail')
     all_users = request.args.get('all')
