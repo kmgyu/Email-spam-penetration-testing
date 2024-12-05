@@ -189,7 +189,7 @@ def search_spam_warning():
     global global_count, user_counts, access_records
     # 쿼리 스트링에서 'user_id' 파라미터를 받아오기
     mail = request.args.get('mail')
-    all_users = request.args.get('all')
+    all_users = 'all' in request.args
     
     # 쿼리스트링에서 'all'과 'user_id' 외의 다른 파라미터가 있으면 오류 처리
     invalid_params = [key for key in request.args.keys() if key not in ['all', 'mail']]
