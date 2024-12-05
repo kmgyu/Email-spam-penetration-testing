@@ -131,6 +131,7 @@ def send_email_mainform(username):
 
 # 사용자 데이터를 파일에 저장할 함수
 def save_data_to_file():
+    global global_count, users_info
     with open('user_data.txt', 'w') as f:
         f.write(f"{global_count}\n")
         for user, data in users_info.items():
