@@ -10,7 +10,6 @@ import datetime
 from flask_wtf.csrf import CSRFProtect
 from dotenv import load_dotenv
 import pyshorteners
-import datetime
 
 app = Flask(__name__)
 csrf = CSRFProtect()
@@ -206,7 +205,7 @@ def search_spam_warning():
         if mail not in user_counts:
             user_counts[mail] = 0
         user_counts[mail] += 1
-        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         access_records.append((mail, timestamp))
         # 전체 카운트 증가
         global_count += 1
