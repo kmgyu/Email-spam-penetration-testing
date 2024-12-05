@@ -10,12 +10,12 @@
     <h2>Total Count: {{ global_count }}</h2>
     <h2>Summary Information</h2>
     <table>
-        <th>
-            <td>user mail</td>
-            <td>counts</td>
-            <td>first stamp</td>
-            <td>last stamp</td>
-        </th>
+        <tr>
+            <th>user mail</th>
+            <th>counts</th>
+            <th>first stamp</th>
+            <th>last stamp</th>
+        </tr>
         {% for user, info in summary_info.items() %}
             <tr>
                 <td>{{user}}</td>
