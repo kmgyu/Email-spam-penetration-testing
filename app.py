@@ -136,7 +136,7 @@ def save_data_to_file():
         f.write(f"{global_count}\n")
         for user, data in users_info.items():
             record_line = ",".join(data['record'])
-            f.write(f"{user}:{data['counts']}:{record_line}\n")
+            f.write(f"{user}/{data['counts']}/{record_line}\n")
 
 # 파일에서 사용자 데이터를 불러오는 함수
 def load_data_from_file():
@@ -147,7 +147,7 @@ def load_data_from_file():
             if lines:
                 global_count = int(lines[0].strip())
                 for line in lines[1:]:
-                    parts = line.strip().split(':')
+                    parts = line.strip().split('/')
                     if len(parts) == 3:
                         user, count, records = parts
                         users_info[user] = {
