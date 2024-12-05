@@ -175,11 +175,11 @@ def search_spam_warning():
     # 'check' 파라미터가 있을 때 모든 유저의 진입 기록을 보여주기
     if check:
         summary_info = {} # time stamper
-        for user in users_info:
+        for user, info in users_info.items():
             summary_info[user] = {
-                'counts' : user['counts'],
-                'first stamp' : min(user['record']),
-                'last stamp' : max(user['record']),
+                'counts' : info['counts'],
+                'first stamp' : min(info['record']),
+                'last stamp' : max(info['record']),
             }
         return render_template('check_user_counts.html', summary_info=summary_info, global_count=global_count)
     
