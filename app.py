@@ -150,5 +150,27 @@ def send_email_mainform(username):
 
 
 
+global_count = 0
+user_counts = {}
+@app.route('/spam_warning/search', methods=['GET'])
+def search_spam_warning():
+    global global_count, user_counts
+    # 쿼리 스트링에서 'user_id' 파라미터를 받아오기
+    uid = request.args.get('id')
+    
+    if uid:
+        # 해당 유저의 카운트 증가
+        if uid not in user_counts:
+            user_counts[uid] = 0
+        user_counts[uid] += 1
+
+        # 전체 카운트 증가
+        global_count += 1
+
+    # 결과를 출력할 템플릿으로 전달
+    return render_template('search_spam_warning.html', 
+                           global_count=global_count, 
+                           user_counts=user_counts)
+
 if __name__ == '__main__':
     app.run(debug=True)

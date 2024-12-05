@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spam Warning Search</title>
+</head>
+<body>
+    <h1>Spam Warning Search</h1>
+    <p>Total Count: {{ global_count }}</p>
+    <h2>User Specific Counts</h2>
+    <ul>
+        {% for user_id, count in user_counts.items() %}
+            <li>User {{ user_id }}: {{ count }} times</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
