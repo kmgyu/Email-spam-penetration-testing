@@ -10,6 +10,7 @@ import datetime
 from flask_wtf.csrf import CSRFProtect
 from dotenv import load_dotenv
 import pyshorteners
+import datetime
 
 app = Flask(__name__)
 csrf = CSRFProtect()
@@ -181,18 +182,31 @@ def send_email_mainform(username):
 
 global_count = 0
 user_counts = {}
+# 접속 기록을 저장할 리스트
+access_records = []
 @app.route('/spam_warning/search', methods=['GET'])
 def search_spam_warning():
     global global_count, user_counts
     # 쿼리 스트링에서 'user_id' 파라미터를 받아오기
     mail = request.args.get('mail')
+    all_users = request.args.get('all')
+    
+    # 쿼리스트링에서 'all'과 'user_id' 외의 다른 파라미터가 있으면 오류 처리
+    invalid_params = [key for key in request.args.keys() if key not in ['all', 'user_id']]
+    if invalid_params:
+        return f"Invalid parameters: {', '.join(invalid_params)}", 404
+    
+    # 'all' 파라미터가 있을 때 모든 유저의 진입 기록을 보여주기
+    if all_users:
+        return render_template('all_user_counts.html', user_counts=user_counts)
     
     if mail:
         # 해당 유저의 카운트 증가
         if mail not in user_counts:
             user_counts[mail] = 0
         user_counts[mail] += 1
-
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        access_records.append((mail, timestamp))
         # 전체 카운트 증가
         global_count += 1
 
