@@ -12,9 +12,9 @@
     <table>
         <th>
             <td>user mail</td>
-            {% for info in summary_info.keys()[0].keys() %}
-            <td> {{info}} </td>
-            {% endfor %}
+            <td>counts</td>
+            <td>first stamp</td>
+            <td>last stamp</td>
         </th>
         {% for user, info in summary_info.items() %}
             <tr>
