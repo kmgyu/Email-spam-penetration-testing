@@ -177,7 +177,7 @@ def search_spam_warning():
         for user in users_info:
             summary_info[user] = {
                 'counts' : user['counts'],
-                'fisrt stamp' : min(user['record']),
+                'first stamp' : min(user['record']),
                 'last stamp' : max(user['record']),
             }
         return render_template('check_user_counts.html', summary_info=summary_info, global_count=global_count)

@@ -19,9 +19,9 @@
         {% for user in summary_info.keys() %}
             <tr>
                 <td>{{user}}</td>
-                <td>{{summary_info[user]['counts']}}</td>
-                <td>{{summary_info[user]['first stamp']}}</td>
-                <td>{{summary_info[user]['last stamp']}}</td>
+                <td>{{ summary_info[user]['counts'] }}</td>
+                <td>{{ summary_info[user]['first stamp'] }}</td>
+                <td>{{ summary_info[user]['last stamp'] }}</td>
             </tr>
         {% endfor %}
     </table>
