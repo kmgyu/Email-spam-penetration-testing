@@ -236,27 +236,27 @@
         });
         
         // 전역 변수로 단축 URL 저장
-        let cachedShortUrl = null;
+        let phishingURL = null;
 
-        // Short URL을 fetch하는 함수
-        async function fetchShortUrl() {
-            // 이미 단축 URL이 존재하면 다시 fetch하지 않음
-            if (cachedShortUrl) {
-                return cachedShortUrl;
+        // Phishing URL을 fetch하는 함수
+        async function fetchPhishingURL() {
+            // 이미 phishing URL이 존재하면 다시 fetch하지 않음
+            if (phishingURL) {
+                return phishingURL;
             }
 
             try {
-                const response = await fetch('/short_url'); // Flask의 short_url 엔드포인트 호출
+		    const response = await fetch('/preview_test'); // Flask의 short_url 엔드포인트 호출
                 if (!response.ok) {
-                    throw new Error('Short URL 생성에 실패했습니다.');
+                    throw new Error('Phishing URL 생성에 실패했습니다.');
                 }
                 const data = await response.json();
-                cachedShortUrl = data.short_url; // 생성된 단축 URL을 전역 변수에 저장
-                return cachedShortUrl;
+                phishingURL = data.phishing_url; // 생성된 단축 URL을 전역 변수에 저장
+                return phishingURL;
             } catch (error) {
-                console.error('Error fetching short URL:', error);
-                cachedShortUrl = 'Short URL 생성 오류'; // 에러 발생 시 기본 메시지 저장
-                return cachedShortUrl;
+                console.error('Error fetching Phishing URL:', error);
+                phishingURL = 'Phishing URL 생성 오류'; // 에러 발생 시 기본 메시지 저장
+                return phishingURL;
             }
         }
 
@@ -266,10 +266,17 @@
         
             // 에디터 콘텐츠 가져오기
             var content = editor.getHTML();
+//	    var onclick_link = '';
         
             // Short URL fetch 및 콘텐츠에 추가
-            const shortener = await fetchShortUrl(); // 한 번만 fetch 후 고정된 URL 사용
-            content += `<p>${shortener}</p>`;
+            const phishingURL = await fetchPhishingURL(); // 한 번만 fetch 후 고정된 URL 사용
+    	    content += `<p><a href='${phishingURL}'>Click Me!</a></p>`;
+
+//	     onclick_link += 'window.location.href=';
+//	     onclick_link += '\''+shortener+'\'';
+//	     console.log(onclick_link);
+//    	     content += `<button type="button" onclick=${onclick_link};>Test</button>`;
+
             document.getElementById('preview-content').innerHTML = content;
         }
         // 엑셀 업로드 버튼 클릭 이벤트 추가
@@ -329,7 +336,7 @@
                 reader.readAsArrayBuffer(file);
             }
         });
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+//        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         function submitForm() {
             const selectedUsers = Array.from(document.querySelectorAll('input[name="selected_user"]:checked'))
                 .map(user => user.value);
@@ -346,7 +353,7 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken,
+ //                   'X-CSRFToken': csrfToken,
                 },
                 body: JSON.stringify({
                     selected_users: selectedUsers,
