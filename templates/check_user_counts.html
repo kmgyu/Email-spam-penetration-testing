@@ -29,7 +29,7 @@
     <ul>
         {% for user in summary_info %}
             <li>
-            {% for key, value in record.items() %}
+            {% for key, value in user.items() %}
                 {{ key }}: {{ value }}
             {% endfor %}
             </li>
