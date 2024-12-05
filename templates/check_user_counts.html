@@ -27,9 +27,10 @@
     </table>
     <h2>User Access Records</h2>
     <ul>
-        {% for user in summary_info %}
+        {% for user, info in summary_info.items() %}
             <li>
-            {% for key, value in user.items() %}
+                {{user ::: }}
+            {% for key, value in info.items() %}
                 {{ key }}: {{ value }}
             {% endfor %}
             </li>
