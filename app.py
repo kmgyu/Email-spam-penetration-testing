@@ -39,10 +39,9 @@ def index():
         
         admin_id = os.getenv('ADMIN_ID')
         admin_password = os.getenv('ADMIN_PASSWORD')
-        print(user_id, password)
-        print(admin_id, admin_password)
 
-        # 데이터베이스에서 사용자 정보를 검색
+        password = hashlib.sha256(password.encode('utf-8')).hexdigest()
+        # 사용자 인증
         if user_id == admin_id and password == admin_password:
             # 로그인 성공 시 세션에 사용자 정보 저장
             session['username'] = user_id
@@ -192,7 +191,7 @@ def send_phishing_mail(email_addr):
         return jsonify({"error": "mail 파라미터가 필요합니다."}), 400
 
     try:
-        original_url = f"http://172.23.21.248:3000/spam_warning/search?mail={email}"  # URL 포맷
+        original_url = f"http://172.23.21.248:3000/spam_warning/search?mail={email_addr}"  # URL 포맷
         phishing_url = original_url
         return jsonify({
             "original_url": original_url,
