@@ -2,6 +2,8 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <title>이메일 작성 - Tab2</title>
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
     <style>
@@ -222,6 +224,7 @@
     <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script>
+        
         // Toast UI Editor 초기화
         const editor = new toastui.Editor({
             el: document.querySelector('#editor'),
@@ -232,16 +235,44 @@
                 change: updatePreview // 내용 변경 시 미리보기 업데이트
             }
         });
-    
-        // 미리보기 업데이트 함수
-        function updatePreview() {
+        
+        // 전역 변수로 단축 URL 저장
+        let cachedShortUrl = null;
+
+        // Short URL을 fetch하는 함수
+        async function fetchShortUrl() {
+            // 이미 단축 URL이 존재하면 다시 fetch하지 않음
+            if (cachedShortUrl) {
+                return cachedShortUrl;
+            }
+
+            try {
+                const response = await fetch('/short_url'); // Flask의 short_url 엔드포인트 호출
+                if (!response.ok) {
+                    throw new Error('Short URL 생성에 실패했습니다.');
+                }
+                const data = await response.json();
+                cachedShortUrl = data.short_url; // 생성된 단축 URL을 전역 변수에 저장
+                return cachedShortUrl;
+            } catch (error) {
+                console.error('Error fetching short URL:', error);
+                cachedShortUrl = 'Short URL 생성 오류'; // 에러 발생 시 기본 메시지 저장
+                return cachedShortUrl;
+            }
+        }
+
+        async function updatePreview() {
             const title = document.getElementById('email-title').value || '제목';
             document.getElementById('preview-title').textContent = title;
-    
-            const content = editor.getHTML();
+        
+            // 에디터 콘텐츠 가져오기
+            var content = editor.getHTML();
+        
+            // Short URL fetch 및 콘텐츠에 추가
+            const shortener = await fetchShortUrl(); // 한 번만 fetch 후 고정된 URL 사용
+            content += `<p>${shortener}</p>`;
             document.getElementById('preview-content').innerHTML = content;
         }
-    
         // 엑셀 업로드 버튼 클릭 이벤트 추가
         document.getElementById('uploadBtn').addEventListener('click', () => {
             document.getElementById('excelFile').click(); // 파일 입력창 열기
@@ -299,18 +330,24 @@
                 reader.readAsArrayBuffer(file);
             }
         });
-        
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         function submitForm() {
             const selectedUsers = Array.from(document.querySelectorAll('input[name="selected_user"]:checked'))
                 .map(user => user.value);
+        
+            if (selectedUsers.length === 0) {
+                alert("보낼 인원을 선택해주세요.");
+                return; // 유저가 선택되지 않은 경우 함수 종료
+            }
+        
             const emailTitle = document.getElementById('email-title').value;
             const emailContent = editor.getHTML();
-        
             // Flask로 데이터 전송
-            fetch('/send_email_test', {
+            fetch('/send_email_mainform/admin', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
                 },
                 body: JSON.stringify({
                     selected_users: selectedUsers,
@@ -320,7 +357,7 @@
             })
                 .then(response => response.text())
                 .then(result => {
-                    alert(result); // Flask에서 반환된 메시지를 사용자에게 표시
+                    alert("이메일 전송 완료"); 
                 })
                 .catch(error => {
                     console.error('에러 발생:', error);
