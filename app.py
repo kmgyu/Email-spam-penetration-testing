@@ -203,9 +203,9 @@ def search_spam_warning():
                            user_counts=user_counts)
 
 @app.route('/short_url', methods=['GET'])
-def short_url():
+def short_url(id="admin"):
     # 원본 URL 설정
-    original_url = "http://172.23.21.248:8080/spam_warning/search?mail="
+    original_url = "http://172.23.21.248:3000/spam_warning/search?mail="+id
     
     # pyshorteners를 사용해 TinyURL 단축 URL 생성
     shortener = pyshorteners.Shortener()
