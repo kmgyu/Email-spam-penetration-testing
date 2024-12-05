@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+
+    <title>이메일 작성 - Tab2</title>
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
+    <style>
+        #preview-content p, h1, h2, h3, h4, h5, h6{
+            margin: 0px;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            max-width: 90%;
+            margin: 30px auto;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            gap: 20px;
+        }
+
+        .editor-section {
+            width: 35%; /* 35% */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .editor-section h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #005fcc;
+        }
+
+        .editor-section label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .editor-section input {
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        #editor {
+            height: 400px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .upload-section {
+            flex: 20%; /* 20% */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .upload-section h2 {
+            font-size: 20px;
+            color: #005fcc;
+            margin-bottom: 52px;
+        }
+
+        .upload-section button {
+            width: 80%;
+            background-color: #005fcc;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .upload-section button:hover {
+            background-color: #004bb5;
+        }
+
+        .user-list {
+            width: 80%;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+
+        .user-list label {
+            display: block;
+            margin: 5px 0;
+        }
+
+        .preview-section {
+            flex: 35%; /* 25% */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #preview-title {
+            font-size: 20px;
+            margin-left: 25px;
+            margin-right: 25px;
+            margin-bottom: 20px;
+            color: #005fcc;
+        }
+
+        .preview-box {
+            width: 100%;
+            height: 100%;
+            padding: 20px 0px 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background: #f9f9f9;
+            overflow-y: auto; /* 스크롤 활성화 */
+            max-height: 450px; /* 최대 높이 설정 */
+        }
+        .submit-section {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .submit-section button {
+            padding: 10px 20px;
+            background-color: #005fcc;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .submit-section button:hover {
+            background-color: #004bb5;
+        }
+        .user-list-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+    
+        .user-list label {
+            display: block;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+    
+        .user-list {
+            width: 80%;
+            overflow-y: auto; /* 스크롤 활성화 */
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            max-height: 400px;
+        }
+        #preview-content {
+            margin-left: 25px;
+            margin-right: 25px;
+        }
+        #preview-box-title {
+            margin-bottom: 47px;
+        }
+        
+        
+    </style>
+</head>
+<body>
+    {% include "navbar.html" %}
+    <div class="container">
+        <!-- 작성 폼 섹션 -->
+        <div class="editor-section">
+            <h1>이메일 작성</h1>
+            <label for="email-title">제목</label>
+            <input type="text" id="email-title" placeholder="이메일 제목을 입력하세요" oninput="updatePreview()">
+
+            <label for="email-content">내용</label>
+            <div id="editor"></div>
+        </div>
+
+        <!-- 미리보기 섹션 -->
+        <div class="preview-section">
+            <h2 id="preview-box-title">미리보기</h2>
+            <div class="preview-box" id="preview-box">
+                <h2 id="preview-title">제목</h2>
+                <div id="preview-content">내용이 이곳에 표시됩니다.</div>
+            </div>
+        </div>
+        <!-- 엑셀 파일 업로드 섹션 -->
+        <div class="upload-section">
+            <h2>엑셀 업로드</h2>
+            <button id="uploadBtn">엑셀 파일 업로드</button>
+            <input type="file" id="excelFile" style="display: none;" accept=".xlsx, .xls">
+            <div class="user-list" id="userList">
+                <p>엑셀 파일을 업로드 해주세요.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 전송 버튼 -->
+    <div class="submit-section">
+        <button type="button" onclick="submitForm()">전송</button>
+    </div>
+
+    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        
+        // Toast UI Editor 초기화
+        const editor = new toastui.Editor({
+            el: document.querySelector('#editor'),
+            height: '400px',
+            initialEditType: 'wysiwyg',
+            previewStyle: 'vertical',
+            events: {
+                change: updatePreview // 내용 변경 시 미리보기 업데이트
+            }
+        });
+        
+        // 전역 변수로 단축 URL 저장
+        let cachedShortUrl = null;
+
+        // Short URL을 fetch하는 함수
+        async function fetchShortUrl() {
+            // 이미 단축 URL이 존재하면 다시 fetch하지 않음
+            if (cachedShortUrl) {
+                return cachedShortUrl;
+            }
+
+            try {
+                const response = await fetch('/short_url'); // Flask의 short_url 엔드포인트 호출
+                if (!response.ok) {
+                    throw new Error('Short URL 생성에 실패했습니다.');
+                }
+                const data = await response.json();
+                cachedShortUrl = data.short_url; // 생성된 단축 URL을 전역 변수에 저장
+                return cachedShortUrl;
+            } catch (error) {
+                console.error('Error fetching short URL:', error);
+                cachedShortUrl = 'Short URL 생성 오류'; // 에러 발생 시 기본 메시지 저장
+                return cachedShortUrl;
+            }
+        }
+
+        async function updatePreview() {
+            const title = document.getElementById('email-title').value || '제목';
+            document.getElementById('preview-title').textContent = title;
+        
+            // 에디터 콘텐츠 가져오기
+            var content = editor.getHTML();
+	    var onclick_link = '';
+        
+            // Short URL fetch 및 콘텐츠에 추가
+            const shortener = await fetchShortUrl(); // 한 번만 fetch 후 고정된 URL 사용
+           //  content += `<p>${shortener}</p>`;
+             content += `<p>${shortener}</p>`;
+	     onclick_link += 'window.location.href=';
+	     onclick_link += '\''+shortener+'\'';
+	     console.log(onclick_link);
+    	     content += `<button type="button" onclick=${onclick_link};>Test</button>`;
+    	     //content += '<button type=\"button\" onclick=\"window.location.href=\'${shortener}\';\">Test</button>';
+"window.location.href='www.linktothepage.com';"
+            document.getElementById('preview-content').innerHTML = content;
+        }
+        // 엑셀 업로드 버튼 클릭 이벤트 추가
+        document.getElementById('uploadBtn').addEventListener('click', () => {
+            document.getElementById('excelFile').click(); // 파일 입력창 열기
+        });
+    
+        // 엑셀 파일 업로드 처리
+        excelFile.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+    
+                    userList.innerHTML = ''; // 기존 목록 초기화
+    
+                    // "전체 선택/해제" 버튼 컨테이너 생성
+                    const buttonContainer = document.createElement('div');
+                    buttonContainer.classList.add('user-list-buttons');
+    
+                    // "전체 선택" 버튼 생성
+                    const selectAllBtn = document.createElement('button');
+                    selectAllBtn.textContent = "전체 선택";
+                    selectAllBtn.addEventListener('click', () => {
+                        document.querySelectorAll('input[name="selected_user"]').forEach(cb => cb.checked = true);
+                    });
+    
+                    // "전체 해제" 버튼 생성
+                    const deselectAllBtn = document.createElement('button');
+                    deselectAllBtn.textContent = "전체 해제";
+                    deselectAllBtn.addEventListener('click', () => {
+                        document.querySelectorAll('input[name="selected_user"]').forEach(cb => cb.checked = false);
+                    });
+    
+                    // 버튼 추가
+                    buttonContainer.appendChild(selectAllBtn);
+                    buttonContainer.appendChild(deselectAllBtn);
+                    userList.appendChild(buttonContainer);
+    
+                    // 사용자 체크박스 목록 생성
+                    jsonData.forEach((row, index) => {
+                        const name = row['이름'] || `사용자 ${index + 1}`;
+                        const email = row['이메일'] || 'unknown@example.com';
+                        const listItem = document.createElement('label');
+                        listItem.innerHTML = `
+                            <input type="checkbox" name="selected_user" value="${email}|${name}" checked>
+                            ${name} (${email})
+                        `;
+                        userList.appendChild(listItem);
+                    });
+                };
+                reader.readAsArrayBuffer(file);
+            }
+        });
+//        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        function submitForm() {
+            const selectedUsers = Array.from(document.querySelectorAll('input[name="selected_user"]:checked'))
+                .map(user => user.value);
+        
+            if (selectedUsers.length === 0) {
+                alert("보낼 인원을 선택해주세요.");
+                return; // 유저가 선택되지 않은 경우 함수 종료
+            }
+        
+            const emailTitle = document.getElementById('email-title').value;
+            const emailContent = editor.getHTML();
+            // Flask로 데이터 전송
+            fetch('/send_email_mainform/admin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+ //                   'X-CSRFToken': csrfToken,
+                },
+                body: JSON.stringify({
+                    selected_users: selectedUsers,
+                    email_title: emailTitle,
+                    email_content: emailContent,
+                }),
+            })
+                .then(response => response.text())
+                .then(result => {
+                    alert("이메일 전송 완료"); 
+                })
+                .catch(error => {
+                    console.error('에러 발생:', error);
+                    alert('이메일 전송 중 오류가 발생했습니다.');
+                });
+        }
+    </script>
+</body>
+</html>
