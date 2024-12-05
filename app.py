@@ -131,9 +131,8 @@ def send_email_mainform(username):
         return render_template('email_mainform.html', name=name)
 
 global_count = 0
-user_counts = {}
+users_info = {}
 # 접속 기록을 저장할 리스트
-access_records = []
 @app.route('/spam_warning/search', methods=['GET'])
 def search_spam_warning():
     global global_count, user_counts, access_records
@@ -148,22 +147,29 @@ def search_spam_warning():
     
     # 'check' 파라미터가 있을 때 모든 유저의 진입 기록을 보여주기
     if check:
-        return render_template('check_user_counts.html', access_records=access_records)
+        summary_info = {} # time stamper
+        for user in users_info:
+            summary_info[user] = {
+                'counts' : user['counts'],
+                'fisrt stamp' : min(user['record']),
+                'last stamp' : max(user['record']),
+            }
+        return render_template('check_user_counts.html', summary_info=summary_info, global_count=global_count)
     
     if mail:
         # 해당 유저의 카운트 증가
-        if mail not in user_counts:
-            user_counts[mail] = 0
-        user_counts[mail] += 1
+        if mail not in users_info:
+            users_info[mail] = {'counts':0, 'record':[]}
+        users_info[mail]['counts'] += 1
         timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        access_records.append({'user_email' : mail, 'Timestamp' : timestamp, 'count':user_counts[mail]})
+        users_info[mail]['record'].append(timestamp)
         # 전체 카운트 증가
         global_count += 1
 
     # 결과를 출력할 템플릿으로 전달
     return render_template('search_spam_warning.html', 
                            global_count=global_count, 
-                           user_counts=user_counts)
+                           users_info=users_info)
 
 @app.route('/preview_test', methods=['GET'])
 def preview_test(id="admin"):
