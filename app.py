@@ -192,7 +192,7 @@ def search_spam_warning():
     all_users = request.args.get('all')
     
     # 쿼리스트링에서 'all'과 'user_id' 외의 다른 파라미터가 있으면 오류 처리
-    invalid_params = [key for key in request.args.keys() if key not in ['all', 'user_id']]
+    invalid_params = [key for key in request.args.keys() if key not in ['all', 'mail']]
     if invalid_params:
         return f"Invalid parameters: {', '.join(invalid_params)}", 404
     
