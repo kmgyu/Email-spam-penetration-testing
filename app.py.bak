@@ -39,9 +39,10 @@ def index():
         
         admin_id = os.getenv('ADMIN_ID')
         admin_password = os.getenv('ADMIN_PASSWORD')
+        print(user_id, password)
+        print(admin_id, admin_password)
 
-        password = hashlib.sha256(password.encode('utf-8')).hexdigest()
-        # 사용자 인증
+        # 데이터베이스에서 사용자 정보를 검색
         if user_id == admin_id and password == admin_password:
             # 로그인 성공 시 세션에 사용자 정보 저장
             session['username'] = user_id
@@ -62,6 +63,47 @@ def logout():
     response = make_response(redirect(url_for('index')))
     response.delete_cookie('access_token_cookie')
     return response
+
+@app.route('/send_email', methods=['POST'])
+def send_email():
+    selected_users = request.form['selected_users']
+    users = json.loads(selected_users)  # ["email1|name1", "email2|name2", ...]
+
+    product_name = request.form['product_name']
+    payment_time = request.form['payment_time']
+    order_number = request.form['order_number']
+    payment_method = request.form['payment_method']
+    amount = request.form['amount']
+
+    # SMTP 서버를 통해 이메일 전송
+    try:
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+            server.starttls()
+            server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+            for user_data in users:
+                email, name = user_data.split('|')
+
+                # 이메일 메시지 작성
+                msg = MIMEMultipart()
+                msg['From'] = EMAIL_ADDRESS
+                msg['To'] = email
+                msg['Subject'] = f"[COOPANG 결제] 결제가 완료되었습니다."
+
+                html_content = render_template(
+                    'email_template.html',
+                    customer_name=name,
+                    product_name=product_name,
+                    payment_time=payment_time,
+                    order_number=order_number,
+                    payment_method=payment_method,
+                    amount=amount
+                )
+                msg.attach(MIMEText(html_content, 'html'))
+                server.send_message(msg)
+
+        return "이메일 전송 성공!"
+    except Exception as e:
+        return f"이메일 전송 실패: {str(e)}"
 
 @app.route('/send_email_mainform/<username>', methods=['GET', 'POST'])
 def send_email_mainform(username):
@@ -103,20 +145,35 @@ def send_email_mainform(username):
                     try:
                         email, name = user_data.split('|')
 
-                        phishing_url = "http://172.23.21.248:3000/spam_warning/search?mail="+email #.split('@')[0]                       
+                        # 각 이메일에 대한 단축 URL 생성
+#                        response = app.test_client().get(f'/main_short_url/{email}')
+#                        if response.status_code != 200:
+#                            raise ValueError("단축 URL 생성 실패")
+                        
+#                        short_url_data = response.get_json()
+#                        short_url = short_url_data.get('short_url', '단축 URL 생성 실패')
+#
+                        short_url = "http://172.23.21.248:3000/spam_warning/search?mail="+email #.split('@')[0]                       
+                        # 이메일 콘텐츠에 단축 URL 삽입
+
+#                        personalized_content = email_content_with_css + f"""
+#                            <p>더 많은 정보를 확인하려면 다음 링크를 클릭하세요: 
+#                            <a href="{short_url}">{short_url}</a></p>
+#                        """
                         personalized_content = email_content_with_css + f"""
-                            <p> <a href="{phishing_url}">
+                            <p> <a href="{short_url}">
                             더 많은 정보를 확인하려면 다음 링크를 클릭하세요:</a> </p> 
                         """
 
                         # 이메일 메시지 작성
                         print(personalized_content)
-                        print(f"phishing_url: ${phishing_url}")
+                        print(f"short_url: ${short_url}")
                         msg = MIMEMultipart()
                         msg['From'] = EMAIL_ADDRESS
                         msg['To'] = email
                         msg['Subject'] = email_title
                         msg.attach(MIMEText(personalized_content, 'html'))
+#                        server.send_message(msg)
                         server.sendmail(EMAIL_ADDRESS, email, msg.as_string())
                     except Exception as user_error:
                         print(f"수신자 {user_data} 처리 중 오류 발생: {user_error}")
@@ -129,83 +186,85 @@ def send_email_mainform(username):
         name = session.get('username', username)
         return render_template('email_mainform.html', name=name)
 
+
+
+
 global_count = 0
-users_info = {}
+user_counts = {}
 # 접속 기록을 저장할 리스트
+access_records = []
 @app.route('/spam_warning/search', methods=['GET'])
 def search_spam_warning():
     global global_count, user_counts, access_records
     # 쿼리 스트링에서 'user_id' 파라미터를 받아오기
     mail = request.args.get('mail')
-    check = 'check' in request.args
+    all_users = 'all' in request.args
     
-    # 쿼리스트링에서 'check'과 'user_id' 외의 다른 파라미터가 있으면 오류 처리
-    invalid_params = [key for key in request.args.keys() if key not in ['check', 'mail']]
+    # 쿼리스트링에서 'all'과 'user_id' 외의 다른 파라미터가 있으면 오류 처리
+    invalid_params = [key for key in request.args.keys() if key not in ['all', 'mail']]
     if invalid_params:
         return f"Invalid parameters: {', '.join(invalid_params)}", 404
     
-    # 'check' 파라미터가 있을 때 모든 유저의 진입 기록을 보여주기
-    if check:
-        summary_info = {} # time stamper
-        for user in users_info:
-            summary_info[user] = {
-                'counts' : user['counts'],
-                'fisrt stamp' : min(user['record']),
-                'last stamp' : max(user['record']),
-            }
-        return render_template('check_user_counts.html', summary_info=summary_info, global_count=global_count)
+    # 'all' 파라미터가 있을 때 모든 유저의 진입 기록을 보여주기
+    if all_users:
+        return render_template('all_user_counts.html', access_records=access_records)
     
     if mail:
         # 해당 유저의 카운트 증가
-        if mail not in users_info:
-            users_info[mail] = {'counts':0, 'record':[]}
-        users_info[mail]['counts'] += 1
+        if mail not in user_counts:
+            user_counts[mail] = 0
+        user_counts[mail] += 1
         timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        users_info[mail]['record'].append(timestamp)
+        access_records.append({'user_email' : mail, 'Timestamp' : timestamp})
         # 전체 카운트 증가
         global_count += 1
 
     # 결과를 출력할 템플릿으로 전달
     return render_template('search_spam_warning.html', 
                            global_count=global_count, 
-                           users_info=users_info)
+                           user_counts=user_counts)
 
-@app.route('/preview_test', methods=['GET'])
-def preview_test(id="admin"):
+@app.route('/short_url', methods=['GET'])
+def short_url(id="admin"):
     # 원본 URL 설정
     original_url = "http://172.23.21.248:3000/spam_warning/search?mail="+id
     
+    # pyshorteners를 사용해 TinyURL 단축 URL 생성
+    shortener = pyshorteners.Shortener()
     try:
-        phishing_url = original_url
+#        short_url = shortener.tinyurl.short(original_url)
+        short_url = original_url
 
         return jsonify({
             "original_url": original_url,
-            "phishing_url": phishing_url
+            "short_url": short_url
         })
     except Exception as e:
         return jsonify({
-            "error": "그냥 실패했습니다.",
+            "error": "단축 URL 생성에 실패했습니다.",
             "details": str(e)
         }), 500
         
-@app.route('/send_phishing_mail/<email_addr>', methods=['GET'])
-def send_phishing_mail(email_addr):
+@app.route('/main_short_url/<email>', methods=['GET'])
+def main_short_url(email):
     """
-         주석!!!
+    이메일 주소 기반으로 단축 URL 생성
     """
-    if not email_addr:
+    if not email:
         return jsonify({"error": "mail 파라미터가 필요합니다."}), 400
 
     try:
-        original_url = f"http://172.23.21.248:3000/spam_warning/search?mail={email_addr}"  # URL 포맷
-        phishing_url = original_url
+        original_url = f"http://172.23.21.248:3000/spam_warning/search?mail={email}"  # URL 포맷
+        # original_url = f"http://127.0.0.1:5000/spam_warning/search?mail={email}"  # test URL 포맷
+        shortener = pyshorteners.Shortener()
+        short_url = shortener.tinyurl.short(original_url)
         return jsonify({
             "original_url": original_url,
-            "phishing_url": phishing_url
+            "short_url": short_url
         })
     except Exception as e:
         return jsonify({
-            "error": "그냥 매우 실패했습니다.",
+            "error": "단축 URL 생성에 실패했습니다.",
             "details": str(e)
         }), 500
 
