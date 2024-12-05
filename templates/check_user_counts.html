@@ -16,12 +16,12 @@
             <td> {{info}} </td>
             {% endfor %}
         </th>
-        {% for user in summary_info.keys() %}
+        {% for user, info in summary_info.items() %}
             <tr>
                 <td>{{user}}</td>
-                <td>{{ summary_info[user]['counts'] }}</td>
-                <td>{{ summary_info[user]['first stamp'] }}</td>
-                <td>{{ summary_info[user]['last stamp'] }}</td>
+                <td>{{ info['counts'] }}</td>
+                <td>{{ info['first stamp'] }}</td>
+                <td>{{ info['last stamp'] }}</td>
             </tr>
         {% endfor %}
     </table>
