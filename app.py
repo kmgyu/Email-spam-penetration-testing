@@ -192,7 +192,7 @@ def send_phishing_mail(email_addr):
         return jsonify({"error": "mail 파라미터가 필요합니다."}), 400
 
     try:
-        original_url = f"http://172.23.21.248:3000/spam_warning/search?mail={email}"  # URL 포맷
+        original_url = f"http://172.23.21.248:3000/spam_warning/search?mail={email_addr}"  # URL 포맷
         phishing_url = original_url
         return jsonify({
             "original_url": original_url,
