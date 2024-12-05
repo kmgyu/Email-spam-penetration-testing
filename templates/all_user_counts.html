@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spam Warning Search</title>
+</head>
+<body>
+    <h1>Spam Warning Search</h1>
+    <h2>User Access Records</h2>
+    <ul>
+        {% for record in access_records %}
+            <li>User Email: {{ record.user_email }} - Timestamp: {{ record.timestamp }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
