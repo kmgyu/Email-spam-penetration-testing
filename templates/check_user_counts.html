@@ -7,9 +7,26 @@
 </head>
 <body>
     <h1>Spam Warning Search</h1>
+    <h2>Total Count: {{ global_count }}</h2>
+    <h2>Summary Information</h2>
+    <table>
+        <th>
+            <td>user mail</td>
+            {% for info in summary_info.keys() %}
+            <td> {{info}} </td>
+            {% endfor %}
+        </th>
+        {% for user in summary_info.keys() %}
+            <tr>
+                <td>{{user}}</td>
+                <td>{{summary_info[user]['counts']}}</td>
+                <td>{{summary_info[user]['first stamp']}}</td>
+                <td>{{summary_info[user]['last stamp']}}</td>
+            </tr>
+    </table>
     <h2>User Access Records</h2>
     <ul>
-        {% for record in access_records %}
+        {% for user in summary_info %}
             <li>
             {% for key, value in record.items() %}
                 {{ key }}: {{ value }}

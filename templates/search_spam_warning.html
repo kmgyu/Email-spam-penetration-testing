@@ -10,8 +10,8 @@
     <p>Total Count: {{ global_count }}</p>
     <h2>User Specific Counts</h2>
     <ul>
-        {% for mail, count in user_counts.items() %}
-            <li>User {{ mail }}: {{ count }} times</li>
+        {% for mail, info in users_info.items() %}
+            <li>User {{ mail }}: {{ info[mail]['counts'] }} times</li>
         {% endfor %}
     </ul>
 </body>

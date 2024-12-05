@@ -129,9 +129,11 @@ def send_email_mainform(username):
         name = session.get('username', username)
         return render_template('email_mainform.html', name=name)
 
+# 접속 기록을 저장할 리스트
 global_count = 0
 users_info = {}
-# 접속 기록을 저장할 리스트
+
+load_data_from_file()
 @app.route('/spam_warning/search', methods=['GET'])
 def search_spam_warning():
     global global_count, user_counts, access_records
@@ -164,11 +166,39 @@ def search_spam_warning():
         users_info[mail]['record'].append(timestamp)
         # 전체 카운트 증가
         global_count += 1
-
+        save_data_to_file()
+        
     # 결과를 출력할 템플릿으로 전달
     return render_template('search_spam_warning.html', 
                            global_count=global_count, 
                            users_info=users_info)
+
+
+# 사용자 데이터를 파일에 저장할 함수
+def save_data_to_file():
+    with open('user_data.txt', 'w') as f:
+        f.write(f"{global_count}\n")
+        for user, data in users_info.items():
+            record_line = ",".join(data['record'])
+            f.write(f"{user}:{data['counts']}:{record_line}\n")
+
+# 파일에서 사용자 데이터를 불러오는 함수
+def load_data_from_file():
+    global global_count, users_info
+    if os.path.exists('user_data.txt'):
+        with open('user_data.txt', 'r') as f:
+            lines = f.readlines()
+            if lines:
+                global_count = int(lines[0].strip())
+                for line in lines[1:]:
+                    parts = line.strip().split(':')
+                    if len(parts) == 3:
+                        user, count, records = parts
+                        users_info[user] = {
+                            'counts': int(count),
+                            'record': records.split(',') if records else []
+                        }
+
 
 @app.route('/preview_test', methods=['GET'])
 def preview_test(id="admin"):
