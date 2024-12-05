@@ -12,7 +12,7 @@
     <table>
         <th>
             <td>user mail</td>
-            {% for info in summary_info.keys().keys() %}
+            {% for info in summary_info.keys()[0].keys() %}
             <td> {{info}} </td>
             {% endfor %}
         </th>
