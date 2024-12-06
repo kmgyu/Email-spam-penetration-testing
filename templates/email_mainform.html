@@ -402,9 +402,9 @@
                     email_link: ctaText
                 }),
             })
-                .then(response => response.text())
+                .then(response => response.json())
                 .then(result => {
-                    alert(result); 
+                    alert(result.message); 
                 })
                 .catch(error => {
                     console.error('에러 발생:', error);
