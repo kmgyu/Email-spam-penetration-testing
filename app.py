@@ -48,8 +48,8 @@ def index():
             session['username'] = user_id
             return redirect(url_for('send_email_mainform', username=user_id))
         else:
-            # 실패 시 에러 메시지와 함께 로그인 화면 반환
-            return render_template('index.html', error="아이디 또는 비밀번호가 잘못되었습니다.")
+            flash("아이디 또는 비밀번호가 잘못되었습니다.")
+            return render_template('index.html')
     else:
         # GET 요청일 경우 세션 확인
         if 'username' in session:
