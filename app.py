@@ -17,10 +17,10 @@ load_dotenv()
 # SMTP 서버 설정
 SMTP_SERVER = 'smtp.gmail.com'
 SMTP_PORT = 587
-EMAIL_ADDRESS = os.getenv['EMAIL_ADDRESS']  # 발신자 이메일
-EMAIL_PASSWORD = os.getenv['EMAIL_PASSWORD']       # 발신자 이메일 비밀번호
-app.config['SECRET_KEY'] = os.getenv['SECRET_KEY']  # 시크릿 키 설정
-SAVE_PATH = os.getenv['SAVE_PATH']
+EMAIL_ADDRESS = os.getenv('EMAIL_ADDRESS')  # 발신자 이메일
+EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')       # 발신자 이메일 비밀번호
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')  # 시크릿 키 설정
+SAVE_PATH = os.getenv('SAVE_PATH')
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(hours=5)  # 토큰 만료 시간 설정 (1시간)
 app.config['JWT_COOKIE_CSRF_PROTECT'] = True
