@@ -25,6 +25,9 @@ app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(hours=5)  # 토큰 만료 시간 설정 (1시간)
 app.config['JWT_COOKIE_CSRF_PROTECT'] = True
 app.config['SESSION_COOKIE_SECURE'] = True
+SERVER_URL = os.getenv('SERVER_URL')
+SERVER_PORT = os.getenv('SERVER_PORT')
+SERVER = f'{SERVER_URL}:{SERVER_PORT}'
 
 temporary_tokens = {}
 # app.config['WTF_CSRF_ENABLED'] = True
@@ -48,8 +51,8 @@ def index():
             session['username'] = user_id
             return redirect(url_for('send_email_mainform', username=user_id))
         else:
-            # 실패 시 에러 메시지와 함께 로그인 화면 반환
-            return render_template('index.html', error="아이디 또는 비밀번호가 잘못되었습니다.")
+            flash("아이디 또는 비밀번호가 잘못되었습니다.")
+            return render_template('index.html')
     else:
         # GET 요청일 경우 세션 확인
         if 'username' in session:
@@ -104,7 +107,7 @@ def send_email_mainform(username):
                     try:
                         email, name = user_data.split('|')
 
-                        phishing_url = "http://172.23.21.248:3000/spam_warning/search?mail="+email #.split('@')[0]                       
+                        phishing_url = f"{SERVER}/spam_warning/search?mail="+email #.split('@')[0]                       
                         personalized_content = email_content_with_css + f"""
                             <p> <a href="{phishing_url}">
                             더 많은 정보를 확인하려면 다음 링크를 클릭하세요:</a> </p> 
@@ -204,7 +207,7 @@ def search_spam_warning():
 @app.route('/preview_test', methods=['GET'])
 def preview_test(id="admin"):
     # 원본 URL 설정
-    original_url = "http://172.23.21.248:3000/spam_warning/search?mail="+id
+    original_url = f"{SERVER}/spam_warning/search?mail="+id
     
     try:
         phishing_url = original_url
@@ -228,7 +231,7 @@ def send_phishing_mail(email_addr):
         return jsonify({"error": "mail 파라미터가 필요합니다."}), 400
 
     try:
-        original_url = f"http://172.23.21.248:3000/spam_warning/search?mail={email_addr}"  # URL 포맷
+        original_url = f"{SERVER}/spam_warning/search?mail={email_addr}"  # URL 포맷
         phishing_url = original_url
         return jsonify({
             "original_url": original_url,

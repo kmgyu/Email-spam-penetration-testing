@@ -91,9 +91,11 @@
 <body>
     {% with messages = get_flashed_messages() %}
         {% if messages %}
-            <script>
-                alert("{{ message }}");
-            </script>
+            {% for message in messages %}
+                <script>
+                    alert("{{ message }}");
+                </script>
+            {% endfor %}
         {% endif %}
     {% endwith %}
     {% include "navbar.html" %}
