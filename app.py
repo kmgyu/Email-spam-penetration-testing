@@ -187,7 +187,7 @@ def search_spam_warning():
                 'first stamp' : min(info['record']),
                 'last stamp' : max(info['record']),
             }
-        return render_template('check_user_counts.html', summary_info=summary_info, global_count=global_count)
+        return render_template('check_user_counts.html', summary_info=summary_info, global_count=global_count, users_info=users_info)
     
     if mail:
         # 해당 유저의 카운트 증가

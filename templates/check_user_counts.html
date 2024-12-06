@@ -6,7 +6,7 @@
     <title>모의 피싱 피해 상세 정보</title>
 </head>
 <body>
-    <h1>모의 피싱 피해 상세 정보<</h1>
+    <h1>모의 피싱 피해 상세 정보</h1>
     <h2>Total Count: {{ global_count }}</h2>
     <h2>Summary Information</h2>
     <table>
@@ -27,14 +27,15 @@
     </table>
     <h2>User Access Records</h2>
     <ul>
-        {% for user, info in summary_info.items() %}
-            <li>
-                {{user}} ::: 
-            {% for key, value in info.items() %}
-                {{ key }}: {{ value }}
+        <li>--------------</li>
+        {% for mail, info in users_info.items() %}
+            <li> User {{mail}} records</li>
+            {% for record in info['record'] %}
+                <li>{{ record }}</li>
             {% endfor %}
-            </li>
+            <li>--------------</li>
         {% endfor %}
+    </ul>
     </ul>
 </body>
 </html>
