@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spam Warning Search</title>
+</head>
+<body>
+    <h1>Spam Warning Search</h1>
+    <h2>Total Count: {{ global_count }}</h2>
+    <h2>Summary Information</h2>
+    <table>
+        <tr>
+            <th>user mail</th>
+            <th>counts</th>
+            <th>first stamp</th>
+            <th>last stamp</th>
+        </tr>
+        {% for user, info in summary_info.items() %}
+            <tr>
+                <td>{{user}}</td>
+                <td>{{ info['counts'] }}</td>
+                <td>{{ info['first stamp'] }}</td>
+                <td>{{ info['last stamp'] }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    <h2>User Access Records</h2>
+    <ul>
+        {% for user, info in summary_info.items() %}
+            <li>
+                {{user}} ::: 
+            {% for key, value in info.items() %}
+                {{ key }}: {{ value }}
+            {% endfor %}
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
