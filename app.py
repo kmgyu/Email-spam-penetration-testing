@@ -74,7 +74,7 @@ def send_email_mainform(username):
         data = request.get_json()  # JSON 데이터 수신
 
         if not data:
-            return jsonify({"error": "유효하지 않은 요청 데이터입니다."}), 400
+            return jsonify({"message": "유효하지 않은 요청 데이터입니다."}), 400
         
         selected_users = data['selected_users']  # ["email1|name1", "email2|name2", ...]
         email_title = data['email_title']
@@ -84,7 +84,7 @@ def send_email_mainform(username):
         print(email_title)
         print(email_content)
         if not selected_users:
-            return jsonify({"error": "수신자 정보가 없습니다."}), 400
+            return jsonify({"message": "수신자 정보가 없습니다."}), 400
 
         # CSS 추가 (p 태그의 margin 제거)
         email_content_with_css = f"""
@@ -130,7 +130,7 @@ def send_email_mainform(username):
 
             return jsonify({"message": "이메일 전송 성공!"}), 200
         except Exception as e:
-            return jsonify({"error": f"이메일 전송 실패: {str(e)}"}), 500
+            return jsonify({"message": f"이메일 전송 실패: {str(e)}"}), 500
     else:
         name = session.get('username', username)
         return render_template('email_mainform.html', name=name)
@@ -230,7 +230,7 @@ def send_phishing_mail(email_addr):
          주석!!!
     """
     if not email_addr:
-        return jsonify({"error": "mail 파라미터가 필요합니다."}), 400
+        return jsonify({"message": "mail 파라미터가 필요합니다."}), 400
 
     try:
         original_url = f"{SERVER}/spam_warning/search?mail={email_addr}"  # URL 포맷
