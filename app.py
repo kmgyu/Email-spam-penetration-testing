@@ -79,6 +79,7 @@ def send_email_mainform(username):
         selected_users = data['selected_users']  # ["email1|name1", "email2|name2", ...]
         email_title = data['email_title']
         email_content = data['email_content']
+        email_link = data['email_link']
         print(selected_users)
         print(email_title)
         print(email_content)
@@ -111,7 +112,7 @@ def send_email_mainform(username):
                         phishing_url = f"{SERVER}/spam_warning/search?mail="+email #.split('@')[0]                       
                         personalized_content = email_content_with_css + f"""
                             <p> <a href="{phishing_url}">
-                            {email_content}</a> </p> 
+                            {email_link}</a> </p> 
                         """
 
                         # 이메일 메시지 작성

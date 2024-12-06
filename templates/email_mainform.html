@@ -387,6 +387,7 @@
             const emailTitle = document.getElementById('email-title').value;
             const emailContent = editor.getHTML();
             spinner.style.display = 'block';
+            const ctaText = document.getElementById('cta-text').value
             // Flask로 데이터 전송
             fetch('/send_email_mainform/admin', {
                 method: 'POST',
@@ -398,6 +399,7 @@
                     selected_users: selectedUsers,
                     email_title: emailTitle,
                     email_content: emailContent,
+                    email_link: ctaText
                 }),
             })
                 .then(response => response.text())
