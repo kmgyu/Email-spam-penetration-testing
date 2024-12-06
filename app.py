@@ -28,7 +28,8 @@ app.config['SESSION_COOKIE_SECURE'] = True
 SERVER_URL = os.getenv('SERVER_URL')
 SERVER_PORT = os.getenv('SERVER_PORT')
 SERVER = f'{SERVER_URL}:{SERVER_PORT}'
-
+SMTP_SERVER = os.getenv('SMTP_SERVER')
+SMTP_PORT = os.getenv('SMTP_PORT')
 temporary_tokens = {}
 # app.config['WTF_CSRF_ENABLED'] = True
 app.config['WTF_CSRF_ENABLED'] = False
@@ -110,7 +111,7 @@ def send_email_mainform(username):
                         phishing_url = f"{SERVER}/spam_warning/search?mail="+email #.split('@')[0]                       
                         personalized_content = email_content_with_css + f"""
                             <p> <a href="{phishing_url}">
-                            더 많은 정보를 확인하려면 다음 링크를 클릭하세요:</a> </p> 
+                            {email_content}</a> </p> 
                         """
 
                         # 이메일 메시지 작성
