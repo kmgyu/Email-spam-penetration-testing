@@ -201,9 +201,7 @@ def search_spam_warning():
         save_data_to_file()
         
     # 결과를 출력할 템플릿으로 전달
-    return render_template('search_spam_warning.html', 
-                           global_count=global_count, 
-                           users_info=users_info)
+    return render_template('search_spam_warning.html')
 
 
 @app.route('/preview_test', methods=['GET'])
