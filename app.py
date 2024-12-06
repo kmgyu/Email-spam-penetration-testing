@@ -17,9 +17,10 @@ load_dotenv()
 # SMTP 서버 설정
 SMTP_SERVER = 'smtp.gmail.com'
 SMTP_PORT = 587
-EMAIL_ADDRESS = 'dage8044@gmail.com'  # 발신자 이메일
-EMAIL_PASSWORD = 'fisupsylmjwhskso'       # 발신자 이메일 비밀번호
-app.config['SECRET_KEY'] = 'root'  # 시크릿 키 설정
+EMAIL_ADDRESS = os.getenv['EMAIL_ADDRESS']  # 발신자 이메일
+EMAIL_PASSWORD = os.getenv['EMAIL_PASSWORD']       # 발신자 이메일 비밀번호
+app.config['SECRET_KEY'] = os.getenv['SECRET_KEY']  # 시크릿 키 설정
+SAVE_PATH = os.getenv['SAVE_PATH']
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(hours=5)  # 토큰 만료 시간 설정 (1시간)
 app.config['JWT_COOKIE_CSRF_PROTECT'] = True
@@ -132,7 +133,7 @@ def send_email_mainform(username):
 # 사용자 데이터를 파일에 저장할 함수
 def save_data_to_file():
     global global_count, users_info
-    with open('user_data.txt', 'w') as f:
+    with open(SAVE_PATH+'user_data.txt', 'w') as f:
         f.write(f"{global_count}\n")
         for user, data in users_info.items():
             record_line = ",".join(data['record'])
@@ -141,8 +142,8 @@ def save_data_to_file():
 # 파일에서 사용자 데이터를 불러오는 함수
 def load_data_from_file():
     global global_count, users_info
-    if os.path.exists('user_data.txt'):
-        with open('user_data.txt', 'r') as f:
+    if os.path.exists(SAVE_PATH+'user_data.txt'):
+        with open(SAVE_PATH+'user_data.txt', 'r') as f:
             lines = f.readlines()
             if lines:
                 global_count = int(lines[0].strip())
