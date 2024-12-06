@@ -133,7 +133,7 @@
         }
         .submit-section {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 30px;
         }
 
         .submit-section button {
@@ -180,6 +180,35 @@
             margin-bottom: 47px;
         }
         
+        #cta-label {
+            margin-top: 10px;
+        }
+        .spinner {
+            display: none; /* 기본적으로 숨김 */
+            position: fixed; /* 화면 고정 */
+            top: 50%; /* 화면 세로 중앙 */
+            left: 50%; /* 화면 가로 중앙 */
+            transform: translate(-50%, -50%); /* 정확히 중앙으로 조정 */
+            z-index: 9999; /* 다른 요소 위로 오도록 설정 */
+        }
+        
+        .spinner .circle {
+            width: 40px; /* 스피너 크기 */
+            height: 40px;
+            border: 5px solid #ccc; /* 스피너 기본 색상 */
+            border-top: 5px solid #3498db; /* 스피너의 회전 색상 */
+            border-radius: 50%; /* 원 모양 */
+            animation: spin 1s linear infinite; /* 회전 애니메이션 */
+        }
+        
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
         
     </style>
 </head>
@@ -194,6 +223,8 @@
 
             <label for="email-content">내용</label>
             <div id="editor"></div>
+            <label id="cta-label" for="cta-text">링크 문구</label>
+            <input type="text" id="cta-text" placeholder="링크 문구를 입력하세요" oninput="updatePreview()">
         </div>
 
         <!-- 미리보기 섹션 -->
@@ -202,6 +233,13 @@
             <div class="preview-box" id="preview-box">
                 <h2 id="preview-title">제목</h2>
                 <div id="preview-content">내용이 이곳에 표시됩니다.</div>
+            </div>
+            <!-- 전송 버튼 -->
+            <div class="submit-section">
+                <button type="button" onclick="submitForm()">전송</button>
+                <div class="spinner" id="spinner">
+                    <div class="circle"></div>
+                </div>
             </div>
         </div>
         <!-- 엑셀 파일 업로드 섹션 -->
@@ -215,10 +253,7 @@
         </div>
     </div>
 
-    <!-- 전송 버튼 -->
-    <div class="submit-section">
-        <button type="button" onclick="submitForm()">전송</button>
-    </div>
+    
 
     <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -270,8 +305,8 @@
         
             // Short URL fetch 및 콘텐츠에 추가
             const phishingURL = await fetchPhishingURL(); // 한 번만 fetch 후 고정된 URL 사용
-    	    content += `<p><a href='${phishingURL}'>Click Me!</a></p>`;
-
+            const ctaText = document.getElementById('cta-text').value || 'Click Me!';
+    	    content += `<p><a href='${phishingURL}'>${ctaText}</a></p>`;
 //	     onclick_link += 'window.location.href=';
 //	     onclick_link += '\''+shortener+'\'';
 //	     console.log(onclick_link);
@@ -338,16 +373,20 @@
         });
 //        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         function submitForm() {
+            const spinner = document.getElementById('spinner');
+            
             const selectedUsers = Array.from(document.querySelectorAll('input[name="selected_user"]:checked'))
                 .map(user => user.value);
         
             if (selectedUsers.length === 0) {
                 alert("보낼 인원을 선택해주세요.");
+                spinner.style.display = 'none';
                 return; // 유저가 선택되지 않은 경우 함수 종료
             }
         
             const emailTitle = document.getElementById('email-title').value;
             const emailContent = editor.getHTML();
+            spinner.style.display = 'block';
             // Flask로 데이터 전송
             fetch('/send_email_mainform/admin', {
                 method: 'POST',
@@ -368,7 +407,12 @@
                 .catch(error => {
                     console.error('에러 발생:', error);
                     alert('이메일 전송 중 오류가 발생했습니다.');
+                })
+                .finally(() => {
+                    // 항상 실행: 스피너 숨기기 & 버튼 다시 활성화
+                    spinner.style.display = 'none';
                 });
+                
         }
     </script>
 </body>
