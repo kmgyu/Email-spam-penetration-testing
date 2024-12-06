@@ -15,8 +15,8 @@ app = Flask(__name__)
 csrf = CSRFProtect()
 load_dotenv()
 # SMTP 서버 설정
-SMTP_SERVER = 'smtp.gmail.com'
-SMTP_PORT = 587
+# SMTP_SERVER = os.getenv('SMTP_SERVER')
+# SMTP_PORT = os.getenv('SMTP_PORT')
 EMAIL_ADDRESS = os.getenv('EMAIL_ADDRESS')  # 발신자 이메일
 EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')       # 발신자 이메일 비밀번호
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')  # 시크릿 키 설정
