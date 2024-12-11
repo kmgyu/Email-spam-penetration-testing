@@ -4,38 +4,69 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>모의 피싱 피해 상세 정보</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <h1>모의 피싱 피해 상세 정보</h1>
-    <h2>Total Count: {{ global_count }}</h2>
-    <h2>Summary Information</h2>
-    <table>
-        <tr>
-            <th>user mail</th>
-            <th>counts</th>
-            <th>first stamp</th>
-            <th>last stamp</th>
-        </tr>
-        {% for user, info in summary_info.items() %}
-            <tr>
-                <td>{{user}}</td>
-                <td>{{ info['counts'] }}</td>
-                <td>{{ info['first stamp'] }}</td>
-                <td>{{ info['last stamp'] }}</td>
-            </tr>
-        {% endfor %}
-    </table>
-    <h2>User Access Records</h2>
-    <ul>
-        <li>--------------</li>
-        {% for mail, info in users_info.items() %}
-            <li> User {{mail}} records</li>
-            {% for record in info['record'] %}
-                <li>{{ record }}</li>
-            {% endfor %}
-            <li>--------------</li>
-        {% endfor %}
-    </ul>
-    </ul>
+<body class="bg-light">
+    <div class="container my-5">
+        <h1 class="text-center mb-4">모의 피싱 피해 상세 정보</h1>
+
+        <!-- Total Count Section -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="card-title">총 접속 횟수</h2>
+                <p class="fs-4">{{ global_count }}</p>
+            </div>
+        </div>
+
+        <!-- Summary Information Section -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="card-title">요약 정보</h2>
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>사용자 이메일</th>
+                            <th>접속 횟수</th>
+                            <th>첫 접속 시간</th>
+                            <th>마지막 접속 시간</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user, info in summary_info.items() %}
+                            <tr>
+                                <td>{{ user }}</td>
+                                <td>{{ info['counts'] }}</td>
+                                <td>{{ info['first stamp'] }}</td>
+                                <td>{{ info['last stamp'] }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- User Access Records Section -->
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title">유저 접속 기록</h2>
+                <ul class="list-group">
+                    <li class="list-group-item">--------------</li>
+                    {% for mail, info in users_info.items() %}
+                        <li class="list-group-item">
+                            <strong>User {{ mail }} records:</strong>
+                        </li>
+                        {% for record in info['record'] %}
+                            <li class="list-group-item">{{ record }}</li>
+                        {% endfor %}
+                        <li class="list-group-item">--------------</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
