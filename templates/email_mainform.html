@@ -387,7 +387,10 @@
             const emailTitle = document.getElementById('email-title').value;
             const emailContent = editor.getHTML();
             spinner.style.display = 'block';
-            const ctaText = document.getElementById('cta-text').value
+            let ctaText = document.getElementById('cta-text').value
+            if (ctaText == "") {
+                ctaText = "Click Me"
+            }
             // Flask로 데이터 전송
             fetch('/send_email_mainform/admin', {
                 method: 'POST',
