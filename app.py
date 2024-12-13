@@ -226,6 +226,8 @@ def init_db():
                 PRIMARY KEY (email, timestamp)
             )
         ''')
+
+        
         conn.commit()
 
 
