@@ -258,10 +258,19 @@ def save_user_log(email):
         
         conn.commit()
 
+def get_global_count():
+    with sql.connect(SAVE_PATH + 'data.db') as conn:
+        cursor = conn.cursor()
+
+        # 전체 사용자 카운트 가져오기
+        cursor.execute('SELECT SUM(counts) FROM user_counts')
+        result = cursor.fetchone()
+
+        return result[0] if result and result[0] else 0
+    
 # Flask route 수정
 @app.route('/spam_warning/search', methods=['GET'])
 def search_spam_warning():
-    global global_count
     email = request.args.get('email')
     check = 'check' in request.args
 
@@ -278,12 +287,11 @@ def search_spam_warning():
             }
             for user in all_users['counts']
         }
-        return render_template('check_user_counts.html', summary_info=summary_info, global_count=global_count)
+        return render_template('check_user_counts.html', summary_info=summary_info, global_count=get_global_count())
 
     if email:
         save_user_count(email)
         save_user_log(email)
-        global_count += 1
 
     return render_template('search_spam_warning.html')
 
