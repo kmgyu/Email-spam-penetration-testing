@@ -9,6 +9,9 @@ from flask_jwt_extended import JWTManager, jwt_required, create_access_token, ge
 import datetime
 from flask_wtf.csrf import CSRFProtect
 from dotenv import load_dotenv
+#sqllite
+import sqlite3 as sql
+
 import pyshorteners
 
 app = Flask(__name__)
@@ -135,73 +138,189 @@ def send_email_mainform(username):
         name = session.get('username', username)
         return render_template('email_mainform.html', name=name)
 
-# 사용자 데이터를 파일에 저장할 함수
-def save_data_to_file():
-    global global_count, users_info
-    with open(SAVE_PATH+'user_data.txt', 'w') as f:
-        f.write(f"{global_count}\n")
-        for user, data in users_info.items():
-            record_line = ",".join(data['record'])
-            f.write(f"{user}/{data['counts']}/{record_line}\n")
+# # 사용자 데이터를 파일에 저장할 함수
+# def save_data_to_file():
+#     global global_count, users_info
+#     with open(SAVE_PATH+'user_data.txt', 'w') as f:
+#         f.write(f"{global_count}\n")
+#         for user, data in users_info.items():
+#             record_line = ",".join(data['record'])
+#             f.write(f"{user}/{data['counts']}/{record_line}\n")
 
-# 파일에서 사용자 데이터를 불러오는 함수
-def load_data_from_file():
-    global global_count, users_info
-    if os.path.exists(SAVE_PATH+'user_data.txt'):
-        with open(SAVE_PATH+'user_data.txt', 'r') as f:
-            lines = f.readlines()
-            if lines:
-                global_count = int(lines[0].strip())
-                for line in lines[1:]:
-                    parts = line.strip().split('/')
-                    if len(parts) == 3:
-                        user, count, records = parts
-                        users_info[user] = {
-                            'counts': int(count),
-                            'record': records.split(',') if records else []
-                        }
+# # 파일에서 사용자 데이터를 불러오는 함수
+# def load_data_from_file():
+#     global global_count, users_info
+#     if os.path.exists(SAVE_PATH+'user_data.txt'):
+#         with open(SAVE_PATH+'user_data.txt', 'r') as f:
+#             lines = f.readlines()
+#             if lines:
+#                 global_count = int(lines[0].strip())
+#                 for line in lines[1:]:
+#                     parts = line.strip().split('/')
+#                     if len(parts) == 3:
+#                         user, count, records = parts
+#                         users_info[user] = {
+#                             'counts': int(count),
+#                             'record': records.split(',') if records else []
+#                         }
 
-# 접속 기록을 저장할 리스트
-global_count = 0
-users_info = {}
+# # 접속 기록을 저장할 리스트
+# global_count = 0
+# users_info = {}
 
-load_data_from_file()
+# load_data_from_file()
+# @app.route('/spam_warning/search', methods=['GET'])
+# def search_spam_warning():
+#     global global_count, user_counts, access_records
+#     # 쿼리 스트링에서 'user_id' 파라미터를 받아오기
+#     mail = request.args.get('mail')
+#     check = 'check' in request.args
+    
+#     # 쿼리스트링에서 'check'과 'user_id' 외의 다른 파라미터가 있으면 오류 처리
+#     invalid_params = [key for key in request.args.keys() if key not in ['check', 'mail']]
+#     if invalid_params:
+#         return f"Invalid parameters: {', '.join(invalid_params)}", 404
+    
+#     # 'check' 파라미터가 있을 때 모든 유저의 진입 기록을 보여주기
+#     if check:
+#         summary_info = {} # time stamper
+#         for user, info in users_info.items():
+#             summary_info[user] = {
+#                 'counts' : info['counts'],
+#                 'first stamp' : min(info['record']),
+#                 'last stamp' : max(info['record']),
+#             }
+#         return render_template('check_user_counts.html', summary_info=summary_info, global_count=global_count, users_info=users_info)
+    
+#     if mail:
+#         # 해당 유저의 카운트 증가
+#         if mail not in users_info:
+#             users_info[mail] = {'counts':0, 'record':[]}
+#         users_info[mail]['counts'] += 1
+#         timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+#         users_info[mail]['record'].append(timestamp)
+#         # 전체 카운트 증가
+#         global_count += 1
+#         save_data_to_file()
+        
+#     # 결과를 출력할 템플릿으로 전달
+#     return render_template('search_spam_warning.html')
+
+#########sqlite사용 부분############
+
+def init_db():
+    with sql.connect(SAVE_PATH+'data.db') as conn:
+        cursor=conn.cursor()
+        # 카운팅용 테이블 생성
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS user_counts (
+                email TEXT PRIMARY KEY,
+                counts INTEGER DEFAULT 0
+                
+            )
+        ''')
+        # 접속 기록용 테이블 생성
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS user_logs (
+                email TEXT PRIMARY KEY,
+                first_timestamp TEXT,
+                latest_timestamp TEXT
+            )
+        ''')
+        conn.commit()
+
+def save_user_count(email):
+    with sql.connect(SAVE_PATH + 'data.db') as conn:
+        cursor = conn.cursor()
+        
+        # 이메일별 카운팅 업데이트
+        cursor.execute('SELECT count FROM user_counts WHERE email = ?', (email,))
+        result = cursor.fetchone()
+        if result:
+            count = result[0] + 1
+            cursor.execute('UPDATE user_counts SET count = ? WHERE email = ?', (count, email))
+        else:
+            cursor.execute('INSERT INTO user_counts (email, count) VALUES (?, ?)', (email, 1))
+        
+        conn.commit()
+
+def save_user_log(email):
+    with sql.connect(SAVE_PATH + 'data.db') as conn:
+        cursor = conn.cursor()
+        
+        # 현재 시간 생성
+        timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        # 사용자의 로그 기록 여부 확인
+        cursor.execute('SELECT first_timestamp, latest_timestamp FROM user_logs WHERE email = ?', (email,))
+        result = cursor.fetchone()
+        
+        if result:
+            # 이미 기록이 있는 경우, latest_timestamp만 업데이트
+            cursor.execute('UPDATE user_logs SET latest_timestamp = ? WHERE email = ?', (timestamp, email))
+        else:
+            # 처음 방문인 경우, first_timestamp와 latest_timestamp 모두 같은 값으로 삽입
+            cursor.execute('INSERT INTO user_logs (email, first_timestamp, latest_timestamp) VALUES (?, ?, ?)', (email, timestamp, timestamp))
+        
+        conn.commit()
+
+# Flask route 수정
 @app.route('/spam_warning/search', methods=['GET'])
 def search_spam_warning():
-    global global_count, user_counts, access_records
-    # 쿼리 스트링에서 'user_id' 파라미터를 받아오기
-    mail = request.args.get('mail')
+    global global_count
+    email = request.args.get('email')
     check = 'check' in request.args
-    
-    # 쿼리스트링에서 'check'과 'user_id' 외의 다른 파라미터가 있으면 오류 처리
-    invalid_params = [key for key in request.args.keys() if key not in ['check', 'mail']]
+
+    invalid_params = [key for key in request.args.keys() if key not in ['check', 'email']]
     if invalid_params:
         return f"Invalid parameters: {', '.join(invalid_params)}", 404
-    
-    # 'check' 파라미터가 있을 때 모든 유저의 진입 기록을 보여주기
+
     if check:
-        summary_info = {} # time stamper
-        for user, info in users_info.items():
-            summary_info[user] = {
-                'counts' : info['counts'],
-                'first stamp' : min(info['record']),
-                'last stamp' : max(info['record']),
+        all_users = get_user_data()
+        summary_info = {
+            user[0]: {
+                'count': user[1],
+                'logs': [log[1] for log in all_users['logs'] if log[0] == user[0]]
             }
-        return render_template('check_user_counts.html', summary_info=summary_info, global_count=global_count, users_info=users_info)
-    
-    if mail:
-        # 해당 유저의 카운트 증가
-        if mail not in users_info:
-            users_info[mail] = {'counts':0, 'record':[]}
-        users_info[mail]['counts'] += 1
-        timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        users_info[mail]['record'].append(timestamp)
-        # 전체 카운트 증가
+            for user in all_users['counts']
+        }
+        return render_template('check_user_counts.html', summary_info=summary_info, global_count=global_count)
+
+    if email:
+        save_user_count(email)
+        save_user_log(email)
         global_count += 1
-        save_data_to_file()
-        
-    # 결과를 출력할 템플릿으로 전달
+
     return render_template('search_spam_warning.html')
+
+def get_user_data(email=None):
+    with sql.connect(SAVE_PATH + 'data.db') as conn:
+        cursor = conn.cursor()
+        
+        if email:
+            # 특정 이메일의 카운트 및 접속 기록 가져오기
+            cursor.execute('SELECT count FROM user_counts WHERE email = ?', (email,))
+            count_result = cursor.fetchone()
+            cursor.execute('SELECT timestamp FROM user_logs WHERE email = ?', (email,))
+            log_results = cursor.fetchall()
+            
+            return {
+                'email': email,
+                'count': count_result[0] if count_result else 0,
+                'logs': [log[0] for log in log_results]
+            }
+        else:
+            # 모든 이메일의 데이터 가져오기
+            cursor.execute('SELECT * FROM user_counts')
+            counts = cursor.fetchall()
+            
+            cursor.execute('SELECT email, timestamp FROM user_logs')
+            logs = cursor.fetchall()
+            
+            return {
+                'counts': counts,
+                'logs': logs
+            }
 
 
 @app.route('/preview_test', methods=['GET'])
@@ -244,4 +363,5 @@ def send_phishing_mail(email_addr):
         }), 500
 
 if __name__ == '__main__':
+    init_db()
     app.run(debug=True, host='0.0.0.0', port=3000)
