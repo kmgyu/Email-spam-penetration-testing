@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 #sqllite
 import sqlite3 as sql
 
-import pyshorteners
+#import pyshorteners
 
 app = Flask(__name__)
 csrf = CSRFProtect()
@@ -209,25 +209,25 @@ def send_email_mainform(username):
 #########sqlite사용 부분############
 
 def init_db():
-    with sql.connect(SAVE_PATH+'data.db') as conn:
-        cursor=conn.cursor()
+    with sql.connect(SAVE_PATH + 'data.db') as conn:
+        cursor = conn.cursor()
         # 카운팅용 테이블 생성
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS user_counts (
                 email TEXT PRIMARY KEY,
                 counts INTEGER DEFAULT 0
-                
             )
         ''')
         # 접속 기록용 테이블 생성
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS user_logs (
-                email TEXT PRIMARY KEY,
-                first_timestamp TEXT,
-                latest_timestamp TEXT
+                email TEXT,
+                timestamp TEXT,
+                PRIMARY KEY (email, timestamp)
             )
         ''')
         conn.commit()
+
 
 def save_user_count(email):
     with sql.connect(SAVE_PATH + 'data.db') as conn:
@@ -251,16 +251,8 @@ def save_user_log(email):
         # 현재 시간 생성
         timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         
-        # 사용자의 로그 기록 여부 확인
-        cursor.execute('SELECT first_timestamp, latest_timestamp FROM user_logs WHERE email = ?', (email,))
-        result = cursor.fetchone()
-        
-        if result:
-            # 이미 기록이 있는 경우, latest_timestamp만 업데이트
-            cursor.execute('UPDATE user_logs SET latest_timestamp = ? WHERE email = ?', (timestamp, email))
-        else:
-            # 처음 방문인 경우, first_timestamp와 latest_timestamp 모두 같은 값으로 삽입
-            cursor.execute('INSERT INTO user_logs (email, first_timestamp, latest_timestamp) VALUES (?, ?, ?)', (email, timestamp, timestamp))
+        # 사용자의 로그 기록 추가
+        cursor.execute('INSERT INTO user_logs (email, timestamp) VALUES (?, ?)', (email, timestamp))
         
         conn.commit()
 
@@ -299,7 +291,7 @@ def get_user_data(email=None):
         
         if email:
             # 특정 이메일의 카운트 및 접속 기록 가져오기
-            cursor.execute('SELECT count FROM user_counts WHERE email = ?', (email,))
+            cursor.execute('SELECT counts FROM user_counts WHERE email = ?', (email,))
             count_result = cursor.fetchone()
             cursor.execute('SELECT timestamp FROM user_logs WHERE email = ?', (email,))
             log_results = cursor.fetchall()
@@ -321,7 +313,6 @@ def get_user_data(email=None):
                 'counts': counts,
                 'logs': logs
             }
-
 
 @app.route('/preview_test', methods=['GET'])
 def preview_test(id="admin"):
