@@ -6,6 +6,11 @@
     <title>모의 피싱 피해 상세 정보</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        th.sortable {
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body class="bg-light">
     <div class="container my-5">
@@ -23,13 +28,13 @@
         <div class="card mb-4">
             <div class="card-body">
                 <h2 class="card-title">요약 정보</h2>
-                <table class="table table-striped table-hover">
+                <table class="table table-striped table-hover" id="summaryTable">
                     <thead>
                         <tr>
-                            <th>사용자 이메일</th>
-                            <th>접속 횟수</th>
-                            <th>첫 접속 시간</th>
-                            <th>마지막 접속 시간</th>
+                            <th class="sortable" onclick="sortTable(0)">사용자 이메일</th>
+                            <th class="sortable" onclick="sortTable(1)">접속 횟수</th>
+                            <th class="sortable" onclick="sortTable(2)">첫 접속 시간</th>
+                            <th class="sortable" onclick="sortTable(3)">마지막 접속 시간</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -68,5 +73,37 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function sortTable(columnIndex) {
+            const table = document.getElementById("summaryTable");
+            const rows = Array.from(table.rows).slice(1);  // 첫 번째 헤더를 제외한 행들
+            const isNumeric = columnIndex === 1; // '접속 횟수'는 숫자 데이터
+
+            const compare = (a, b) => {
+                const cellA = a.cells[columnIndex].innerText;
+                const cellB = b.cells[columnIndex].innerText;
+
+                if (isNumeric) {
+                    return parseInt(cellA) - parseInt(cellB);
+                } else {
+                    return cellA.localeCompare(cellB);
+                }
+            };
+
+            rows.sort(compare);
+
+            // Reverse the rows to toggle between ascending and descending order
+            if (table.querySelector('thead th:nth-child(' + (columnIndex + 1) + ')').classList.contains('asc')) {
+                rows.reverse();
+                table.querySelector('thead th:nth-child(' + (columnIndex + 1) + ')').classList.remove('asc');
+                table.querySelector('thead th:nth-child(' + (columnIndex + 1) + ')').classList.add('desc');
+            } else {
+                table.querySelector('thead th:nth-child(' + (columnIndex + 1) + ')').classList.add('asc');
+                table.querySelector('thead th:nth-child(' + (columnIndex + 1) + ')').classList.remove('desc');
+            }
+
+            rows.forEach(row => table.appendChild(row)); // 재정렬된 행을 다시 테이블에 추가
+        }
+    </script>
 </body>
 </html>
