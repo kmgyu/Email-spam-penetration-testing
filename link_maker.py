@@ -1,7 +1,7 @@
 import requests
 
 
-TOKEN = 'b91dc18b7348be2e3d0e1e31d7f794019437e1eb'
+TOKEN = 'blablabala'
 url = 'https://api-ssl.bitly.com/v4/shorten'
 
 headers = {
