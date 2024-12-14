@@ -221,9 +221,9 @@ def init_db():
         # 접속 기록용 테이블 생성
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS user_logs (
-                email TEXT,
-                timestamp TEXT,
-                PRIMARY KEY (email, timestamp)
+                email TEXT PRIMARY KEY,
+                timestamp TEXT
+                
             )
         ''')
 
@@ -279,15 +279,23 @@ def search_spam_warning():
         return f"Invalid parameters: {', '.join(invalid_params)}", 404
 
     if check:
-        all_users = get_user_data()
+        all_users = get_user_data()  # 사용자 데이터 가져오기
         summary_info = {
-            user[0]: {
-                'count': user[1],
-                'logs': [log[1] for log in all_users['logs'] if log[0] == user[0]]
+            user[0]: {  
+                'counts': user[1],  # 접속 횟수
+                'first stamp': min(log[1] for log in all_users['logs'] if log[0] == user[0]),  # 첫 접속 시간
+                'last stamp': max(log[1] for log in all_users['logs'] if log[0] == user[0])  # 마지막 접속 시간
             }
-            for user in all_users['counts']
+            for user in all_users['counts']  # 'counts'에서 사용자 정보를 가져옵니다.
         }
-        return render_template('check_user_counts.html', summary_info=summary_info, global_count=get_global_count())
+        
+        users_info = {
+            user[0]: {  
+                'record': [log[1] for log in all_users['logs'] if log[0] == user[0]]  # 접속 기록
+            }
+            for user in all_users['counts']  # 'counts'에서 사용자 정보를 가져옵니다.
+        }
+        return render_template('check_user_counts.html', users_info=users_info, summary_info=summary_info, global_count=get_global_count())
 
     if email:
         save_user_count(email)
