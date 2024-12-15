@@ -112,7 +112,7 @@ def send_email_mainform(username):
                     try:
                         email, name = user_data.split('|')
 
-                        phishing_url = f"{SERVER}/spam_warning/search?mail="+email #.split('@')[0]                       
+                        phishing_url = f"{SERVER}/spam_warning/search?email="+email #.split('@')[0]                       
                         personalized_content = email_content_with_css + f"""
                             <p> <a href="{phishing_url}">
                             {email_link}</a> </p> 
@@ -335,7 +335,7 @@ def get_user_data(email=None):
 @app.route('/preview_test', methods=['GET'])
 def preview_test(id="admin"):
     # 원본 URL 설정
-    original_url = f"{SERVER}/spam_warning/search?mail="+id
+    original_url = f"{SERVER}/spam_warning/search?email="+id
     
     try:
         phishing_url = original_url
@@ -359,7 +359,7 @@ def send_phishing_mail(email_addr):
         return jsonify({"message": "mail 파라미터가 필요합니다."}), 400
 
     try:
-        original_url = f"{SERVER}/spam_warning/search?mail={email_addr}"  # URL 포맷
+        original_url = f"{SERVER}/spam_warning/search?email={email_addr}"  # URL 포맷
         phishing_url = original_url
         return jsonify({
             "original_url": original_url,
