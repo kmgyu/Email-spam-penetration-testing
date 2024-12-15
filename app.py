@@ -221,8 +221,9 @@ def init_db():
         # 접속 기록용 테이블 생성
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS user_logs (
-                email TEXT PRIMARY KEY,
-                timestamp TEXT
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                email TEXT NOT NULL,
+                timestamp TEXT NOT NULL
                 
             )
         ''')
@@ -253,7 +254,6 @@ def save_user_log(email):
         # 현재 시간 생성
         timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         
-        # 사용자의 로그 기록 추가
         cursor.execute('INSERT INTO user_logs (email, timestamp) VALUES (?, ?)', (email, timestamp))
         
         conn.commit()
@@ -297,9 +297,9 @@ def search_spam_warning():
         }
         return render_template('check_user_counts.html', users_info=users_info, summary_info=summary_info, global_count=get_global_count())
 
-    if email:
-        save_user_count(email)
+    if email:      
         save_user_log(email)
+        save_user_count(email)
 
     return render_template('search_spam_warning.html')
 
