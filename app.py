@@ -236,13 +236,13 @@ def save_user_count(email):
         cursor = conn.cursor()
         
         # 이메일별 카운팅 업데이트
-        cursor.execute('SELECT count FROM user_counts WHERE email = ?', (email,))
+        cursor.execute('SELECT counts FROM user_counts WHERE email = ?', (email,))
         result = cursor.fetchone()
         if result:
             count = result[0] + 1
-            cursor.execute('UPDATE user_counts SET count = ? WHERE email = ?', (count, email))
+            cursor.execute('UPDATE user_counts SET counts = ? WHERE email = ?', (count, email))
         else:
-            cursor.execute('INSERT INTO user_counts (email, count) VALUES (?, ?)', (email, 1))
+            cursor.execute('INSERT INTO user_counts (email, counts) VALUES (?, ?)', (email, 1))
         
         conn.commit()
 
